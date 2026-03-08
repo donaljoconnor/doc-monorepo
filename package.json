@@ -1,0 +1,19 @@
+{
+  "name": "doc-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "pnpm -r dev",
+    "dev:apps": "pnpm --filter @doc-monorepo/apps dev",
+    "dev:web-components": "pnpm --filter @doc-monorepo/web-components dev",
+    "dev:api": "pnpm --filter @doc-monorepo/api dev",
+    "build": "pnpm -r build",
+    "build:apps": "pnpm --filter @doc-monorepo/apps build",
+    "build:web-components": "pnpm --filter @doc-monorepo/web-components build",
+    "build:api": "pnpm --filter @doc-monorepo/api build",
+    "preview": "pnpm -r preview"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}
