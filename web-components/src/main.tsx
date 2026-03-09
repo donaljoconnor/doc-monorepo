@@ -1,2 +1,6 @@
 import './index.css'
 import './dashboard-element'
+import './table-demo-element'
+import './accounts-dashboard-element'
+import './products-dashboard-element'
+import './action-search-bar-element'

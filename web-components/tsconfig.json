@@ -3,8 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["../apps/src/*"]
+      "@/*": ["../apps/src/*"],
+      "@api/*": ["../api/src/*"]
     }
   },
-  "include": ["src", "../apps/src"]
+  "include": ["src", "../apps/src", "../api/src"]
 }
