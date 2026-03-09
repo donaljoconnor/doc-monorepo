@@ -3,7 +3,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
@@ -15,98 +14,198 @@ import {
   ChevronRightIcon,
   ChevronsLeftIcon,
   ChevronsRightIcon,
-  ChevronsUpDownIcon,
-  ChevronUpIcon,
-  ChevronDownIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  ArrowUpDownIcon,
+  SearchIcon,
 } from "lucide-react"
 import { useGetProducts } from "@/hooks/useProducts"
 import type { Product } from "@/mocks/products.data"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 
-function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
-  if (isSorted === "asc") return <ChevronUpIcon className="ml-1 inline size-3.5" />
-  if (isSorted === "desc") return <ChevronDownIcon className="ml-1 inline size-3.5" />
-  return <ChevronsUpDownIcon className="ml-1 inline size-3.5 opacity-40" />
+// ─── Rating dots ─────────────────────────────────────────────────────────────
+function RatingDots({ value }: { value: number }) {
+  const filled = Math.round(value)
+  return (
+    <div className="flex items-center gap-0.75">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span
+          key={i}
+          className="inline-block size-1.75 rounded-full"
+          style={{
+            background: i < filled ? "#E54D2E" : "#D9D9D6",
+            opacity: i < filled ? 1 : 0.5,
+          }}
+        />
+      ))}
+      <span
+        className="ml-1.5 text-[11px] tabular-nums"
+        style={{ color: "#6F6F6B" }}
+      >
+        {value.toFixed(1)}
+      </span>
+    </div>
+  )
 }
 
+// ─── Stock badge ──────────────────────────────────────────────────────────────
+function StockBadge({ stock }: { stock: number }) {
+  if (stock === 0) {
+    return (
+      <span
+        className="text-[11px] tracking-wide uppercase"
+        style={{ color: "#A8A8A4" }}
+      >
+        Out
+      </span>
+    )
+  }
+  const level = stock > 50 ? "high" : stock > 10 ? "mid" : "low"
+  const color = level === "high" ? "#3D9A60" : level === "mid" ? "#D97706" : "#E54D2E"
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span
+        className="inline-block size-1.5 rounded-full"
+        style={{ background: color }}
+      />
+      <span className="tabular-nums text-sm" style={{ color: "#111110" }}>
+        {stock.toLocaleString()}
+      </span>
+    </span>
+  )
+}
+
+// ─── Sort icon ────────────────────────────────────────────────────────────────
+function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
+  const cls = "ml-1 inline size-3"
+  if (isSorted === "asc") return <ArrowUpIcon className={cls} style={{ color: "#E54D2E" }} />
+  if (isSorted === "desc") return <ArrowDownIcon className={cls} style={{ color: "#E54D2E" }} />
+  return <ArrowUpDownIcon className={cls} style={{ color: "#C4C4C0" }} />
+}
+
+// ─── Thumbnail hover cell ─────────────────────────────────────────────────────
+function ProductTitle({ product }: { product: Product }) {
+  const [hovered, setHovered] = React.useState(false)
+
+  return (
+    <span
+      className="relative inline-flex items-center gap-2 cursor-default"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {hovered && product.thumbnail && (
+        <span
+          className="absolute bottom-full left-0 z-50 mb-2 block rounded overflow-hidden shadow-xl"
+          style={{
+            width: 120,
+            height: 120,
+            border: "1px solid #E5E5E3",
+            background: "#FFF",
+          }}
+        >
+          <img
+            src={product.thumbnail}
+            alt={product.title}
+            className="size-full object-contain p-1"
+          />
+        </span>
+      )}
+      <span className="font-medium text-sm" style={{ color: "#111110" }}>
+        {product.title}
+      </span>
+    </span>
+  )
+}
+
+// ─── Columns ──────────────────────────────────────────────────────────────────
 const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => <span className="font-medium">{row.original.title}</span>,
+    header: "Product",
+    cell: ({ row }) => <ProductTitle product={row.original} />,
     enableSorting: true,
   },
   {
     accessorKey: "brand",
     header: "Brand",
+    cell: ({ row }) => (
+      <span
+        className="text-xs tracking-widest uppercase"
+        style={{ color: "#6F6F6B" }}
+      >
+        {row.original.brand}
+      </span>
+    ),
     enableSorting: true,
   },
   {
     accessorKey: "category",
     header: "Category",
     cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground">
+      <span
+        className="inline-block rounded-sm px-2 py-0.5 text-[11px] tracking-wide uppercase"
+        style={{
+          background: "#F0F0EE",
+          color: "#6F6F6B",
+          border: "1px solid #E5E5E3",
+        }}
+      >
         {row.original.category}
-      </Badge>
+      </span>
     ),
     enableSorting: true,
   },
   {
     accessorKey: "price",
     header: "Price",
-    cell: ({ row }) => (
-      <div className="text-right">
-        {row.original.price.toLocaleString(undefined, { style: "currency", currency: "USD" })}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const price = row.original.price
+      const discount = row.original.discountPercentage
+      const discounted = price * (1 - discount / 100)
+      return (
+        <div className="text-right">
+          <span className="text-sm font-semibold tabular-nums" style={{ color: "#111110" }}>
+            ${discounted.toFixed(2)}
+          </span>
+          {discount > 0.1 && (
+            <span
+              className="ml-1.5 text-xs tabular-nums line-through"
+              style={{ color: "#A8A8A4" }}
+            >
+              ${price.toFixed(2)}
+            </span>
+          )}
+        </div>
+      )
+    },
     enableSorting: true,
   },
   {
     accessorKey: "discountPercentage",
-    header: "Discount",
-    cell: ({ row }) => (
-      <div className="text-right">{row.original.discountPercentage.toFixed(1)}%</div>
-    ),
+    header: "Off",
+    cell: ({ row }) => {
+      const d = row.original.discountPercentage
+      if (d < 0.1) return <span style={{ color: "#C4C4C0" }}>—</span>
+      return (
+        <span
+          className="text-xs font-medium tabular-nums px-1.5 py-0.5 rounded-sm"
+          style={{ background: "#FEE9E5", color: "#E54D2E" }}
+        >
+          -{d.toFixed(0)}%
+        </span>
+      )
+    },
     enableSorting: true,
   },
   {
     accessorKey: "rating",
     header: "Rating",
-    cell: ({ row }) => (
-      <div className="text-right">{row.original.rating.toFixed(1)} / 5</div>
-    ),
+    cell: ({ row }) => <RatingDots value={row.original.rating} />,
     enableSorting: true,
   },
   {
     accessorKey: "stock",
     header: "Stock",
-    cell: ({ row }) =>
-      row.original.stock > 0 ? (
-        <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-          {row.original.stock}
-        </Badge>
-      ) : (
-        <Badge variant="outline" className="text-muted-foreground">Out of Stock</Badge>
-      ),
+    cell: ({ row }) => <StockBadge stock={row.original.stock} />,
     enableSorting: true,
   },
   {
@@ -115,11 +214,22 @@ const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
         {row.original.tags.length === 0 ? (
-          <span className="text-muted-foreground">—</span>
+          <span style={{ color: "#C4C4C0" }}>—</span>
         ) : (
-          row.original.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs capitalize">{tag}</Badge>
+          row.original.tags.slice(0, 3).map((tag) => (
+            <span
+              key={tag}
+              className="text-[10px] tracking-wide uppercase px-1.5 py-0.5 rounded-sm"
+              style={{ background: "#F5F5F3", color: "#8C8C88", border: "1px solid #E5E5E3" }}
+            >
+              {tag}
+            </span>
           ))
+        )}
+        {row.original.tags.length > 3 && (
+          <span className="text-[10px]" style={{ color: "#A8A8A4" }}>
+            +{row.original.tags.length - 3}
+          </span>
         )}
       </div>
     ),
@@ -127,173 +237,279 @@ const columns: ColumnDef<Product>[] = [
   },
 ]
 
+// ─── Main component ───────────────────────────────────────────────────────────
 export function ProductsDashboard() {
-  const { data, isLoading, isError } = useGetProducts()
-
   const [globalFilter, setGlobalFilter] = React.useState("")
+
+  // Reset to first page whenever search changes
+  React.useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }))
+  }, [globalFilter])
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   })
 
+  const { data, isLoading, isError } = useGetProducts({
+    limit: pagination.pageSize,
+    skip: pagination.pageIndex * pagination.pageSize,
+  })
+
   const table = useReactTable({
     data: data?.products ?? [],
     columns,
+    rowCount: data?.total ?? 0,
     state: { globalFilter, sorting, pagination },
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   })
 
+  const total = data?.total ?? 0
+
   return (
-    <div className="flex flex-col gap-4 p-4 lg:p-6">
-      <div className="flex items-center gap-2">
-        <Input
-          placeholder="Search products…"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="max-w-sm"
-        />
+    <div
+      className="min-h-screen"
+      style={{ background: "#FAFAF8", fontFamily: "var(--font-sans)" }}
+    >
+      {/* ── Header ── */}
+      <div
+        className="flex items-end justify-between px-8 pt-10 pb-5"
+        style={{ borderBottom: "1.5px solid #111110" }}
+      >
+        <div className="flex items-baseline gap-4">
+          <h1
+            className="text-[11px] font-semibold tracking-[0.25em] uppercase"
+            style={{ color: "#111110" }}
+          >
+            Products
+          </h1>
+          {data && (
+            <span
+              className="text-[11px] tabular-nums"
+              style={{ color: "#A8A8A4" }}
+            >
+              {total.toLocaleString()} {globalFilter ? "results" : "items"}
+            </span>
+          )}
+        </div>
+
+        {/* Search */}
+        <div className="relative flex items-center">
+          <SearchIcon
+            className="absolute left-0 size-3.5 pointer-events-none"
+            style={{ color: "#A8A8A4" }}
+          />
+          <input
+            type="text"
+            placeholder="Search…"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="bg-transparent pl-5 text-sm outline-none placeholder:text-[#C4C4C0]"
+            style={{
+              color: "#111110",
+              borderBottom: "1px solid #D9D9D6",
+              paddingBottom: "2px",
+              width: 220,
+            }}
+          />
+        </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border">
-        <Table>
-          <TableHeader className="bg-muted sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+      {/* ── Table ── */}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            {table.getHeaderGroups().map((hg) => (
+              <tr key={hg.id} style={{ borderBottom: "1px solid #E5E5E3" }}>
+                {hg.headers.map((header) => {
                   const canSort = header.column.getCanSort()
-                  const sorted = header.column.getIsSorted()
                   return (
-                    <TableHead key={header.id}>
+                    <th
+                      key={header.id}
+                      className="px-4 py-3 text-left font-medium"
+                      style={{
+                        fontSize: 10,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        color: "#A8A8A4",
+                        whiteSpace: "nowrap",
+                        background: "#FAFAF8",
+                      }}
+                    >
                       {header.isPlaceholder ? null : canSort ? (
                         <button
-                          className="flex cursor-pointer items-center select-none"
+                          className="inline-flex items-center gap-0.5 cursor-pointer select-none hover:opacity-70 transition-opacity"
                           onClick={header.column.getToggleSortingHandler()}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
-                          <SortIcon isSorted={sorted} />
+                          <SortIcon isSorted={header.column.getIsSorted()} />
                         </button>
                       ) : (
                         flexRender(header.column.columnDef.header, header.getContext())
                       )}
-                    </TableHead>
+                    </th>
                   )
                 })}
-              </TableRow>
+              </tr>
             ))}
-          </TableHeader>
-          <TableBody>
+          </thead>
+
+          <tbody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  Loading…
-                </TableCell>
-              </TableRow>
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-16 text-center text-sm"
+                  style={{ color: "#A8A8A4" }}
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <span
+                      className="inline-block size-1.5 rounded-full animate-pulse"
+                      style={{ background: "#E54D2E" }}
+                    />
+                    Loading catalogue…
+                  </span>
+                </td>
+              </tr>
             ) : isError ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-destructive">
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-16 text-center text-sm"
+                  style={{ color: "#E54D2E" }}
+                >
                   Failed to load products.
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             ) : table.getRowModel().rows.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  No products found.
-                </TableCell>
-              </TableRow>
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-16 text-center text-sm"
+                  style={{ color: "#A8A8A4" }}
+                >
+                  No products match your search.
+                </td>
+              </tr>
             ) : (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+              table.getRowModel().rows.map((row, i) => (
+                <tr
+                  key={row.id}
+                  className="transition-colors"
+                  style={{
+                    borderBottom: "1px solid #F0F0EE",
+                    background: i % 2 === 0 ? "#FAFAF8" : "#F7F7F5",
+                  }}
+                  onMouseEnter={(e) => {
+                    ;(e.currentTarget as HTMLTableRowElement).style.background = "#F0F0ED"
+                  }}
+                  onMouseLeave={(e) => {
+                    ;(e.currentTarget as HTMLTableRowElement).style.background =
+                      i % 2 === 0 ? "#FAFAF8" : "#F7F7F5"
+                  }}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <td
+                      key={cell.id}
+                      className="px-4 py-3"
+                      style={{ verticalAlign: "middle" }}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                    </td>
                   ))}
-                </TableRow>
+                </tr>
               ))
             )}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {data
-            ? `${table.getFilteredRowModel().rows.length} product${table.getFilteredRowModel().rows.length !== 1 ? "s" : ""}`
-            : null}
+      {/* ── Pagination ── */}
+      <div
+        className="flex items-center justify-between px-8 py-4"
+        style={{ borderTop: "1px solid #E5E5E3" }}
+      >
+        {/* Rows per page */}
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] tracking-widest uppercase" style={{ color: "#A8A8A4" }}>
+            Per page
+          </span>
+          <div className="flex gap-1">
+            {[10, 20, 50].map((n) => (
+              <button
+                key={n}
+                onClick={() => table.setPageSize(n)}
+                className="px-2.5 py-1 text-xs rounded-sm transition-colors"
+                style={{
+                  background: pagination.pageSize === n ? "#111110" : "transparent",
+                  color: pagination.pageSize === n ? "#FAFAF8" : "#6F6F6B",
+                  border: "1px solid",
+                  borderColor: pagination.pageSize === n ? "#111110" : "#E5E5E3",
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex items-center gap-8">
-          <div className="hidden items-center gap-2 lg:flex">
-            <Label htmlFor="rows-per-page" className="text-sm font-medium">
-              Rows per page
-            </Label>
-            <Select
-              value={`${pagination.pageSize}`}
-              onValueChange={(value) => table.setPageSize(Number(value))}
-              items={[5, 10, 20].map((n) => ({ label: `${n}`, value: `${n}` }))}
-            >
-              <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                <SelectValue placeholder={pagination.pageSize} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                <SelectGroup>
-                  {[5, 10, 20].map((n) => (
-                    <SelectItem key={n} value={`${n}`}>{n}</SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="text-sm font-medium">
-            Page {pagination.pageIndex + 1} of {table.getPageCount()}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="hidden size-8 lg:flex"
-              size="icon"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">First page</span>
-              <ChevronsLeftIcon />
-            </Button>
-            <Button
-              variant="outline"
-              className="size-8"
-              size="icon"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Previous page</span>
-              <ChevronLeftIcon />
-            </Button>
-            <Button
-              variant="outline"
-              className="size-8"
-              size="icon"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Next page</span>
-              <ChevronRightIcon />
-            </Button>
-            <Button
-              variant="outline"
-              className="hidden size-8 lg:flex"
-              size="icon"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Last page</span>
-              <ChevronsRightIcon />
-            </Button>
+
+        {/* Page nav */}
+        <div className="flex items-center gap-4">
+          <span
+            className="text-[11px] tabular-nums tracking-wide"
+            style={{ color: "#A8A8A4" }}
+          >
+            {pagination.pageIndex + 1} / {table.getPageCount() || 1}
+          </span>
+          <div className="flex items-center gap-1">
+            {[
+              {
+                icon: <ChevronsLeftIcon className="size-3.5" />,
+                action: () => table.setPageIndex(0),
+                disabled: !table.getCanPreviousPage(),
+                label: "First",
+              },
+              {
+                icon: <ChevronLeftIcon className="size-3.5" />,
+                action: () => table.previousPage(),
+                disabled: !table.getCanPreviousPage(),
+                label: "Prev",
+              },
+              {
+                icon: <ChevronRightIcon className="size-3.5" />,
+                action: () => table.nextPage(),
+                disabled: !table.getCanNextPage(),
+                label: "Next",
+              },
+              {
+                icon: <ChevronsRightIcon className="size-3.5" />,
+                action: () => table.setPageIndex(table.getPageCount() - 1),
+                disabled: !table.getCanNextPage(),
+                label: "Last",
+              },
+            ].map(({ icon, action, disabled, label }) => (
+              <button
+                key={label}
+                onClick={action}
+                disabled={disabled}
+                className="flex size-7 items-center justify-center rounded-sm transition-colors"
+                style={{
+                  border: "1px solid #E5E5E3",
+                  color: disabled ? "#D9D9D6" : "#6F6F6B",
+                  background: disabled ? "transparent" : "#FAFAF8",
+                  cursor: disabled ? "not-allowed" : "pointer",
+                }}
+              >
+                <span className="sr-only">{label}</span>
+                {icon}
+              </button>
+            ))}
           </div>
         </div>
       </div>
