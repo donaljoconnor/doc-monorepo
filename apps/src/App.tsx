@@ -1,7 +1,7 @@
-import { ProductsDashboard } from "@/components/ProductsDashboard";
+import { PostsDashboard } from "@/components/PostsDashboard";
 
 function App() {
-  return <ProductsDashboard />;
+  return <PostsDashboard />;
 }
 
 export default App;
