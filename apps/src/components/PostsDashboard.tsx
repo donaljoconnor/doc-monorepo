@@ -93,10 +93,10 @@ export function PostsDashboard() {
                   data?.posts.map((post) => (
                     <TableRow key={post.id}>
                       <TableCell className="font-medium">{post.id}</TableCell>
-                      <TableCell className="max-w-[260px] truncate">
+                      <TableCell className="max-w-65 truncate">
                         {post.title}
                       </TableCell>
-                      <TableCell className="max-w-[380px] truncate text-muted-foreground">
+                      <TableCell className="max-w-95 truncate text-muted-foreground">
                         {post.body}
                       </TableCell>
                       <TableCell>{post.userId}</TableCell>
