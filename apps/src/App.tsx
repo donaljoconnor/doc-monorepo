@@ -1,7 +1,7 @@
-import { DashboardPage } from "./app/dashboard/page";
+import { ProductsDashboard } from "@/components/ProductsDashboard";
 
 function App() {
-  return <DashboardPage />;
+  return <ProductsDashboard />;
 }
 
 export default App;
