@@ -13,17 +13,20 @@ import {
 interface BasicUser {
   id: string;
   name: string;
+  username: string;
   email: string;
-  role: string;
-  createdAt: string;
+  job_title: string;
+  company: string;
+  subscription_status: string;
+  created_at: string;
 }
 
-async function getBasicUser(): Promise<BasicUser> {
-  const response = await fetch("https://mockly.me/user/basic");
+async function getUsers(): Promise<BasicUser[]> {
+  const response = await fetch("https://mockly.me/users");
   if (!response.ok) {
-    throw new Error(`Failed to load user: ${response.status}`);
+    throw new Error(`Failed to load users: ${response.status}`);
   }
-  return response.json() as Promise<BasicUser>;
+  return response.json() as Promise<BasicUser[]>;
 }
 
 export function UserDashboard() {
@@ -31,11 +34,11 @@ export function UserDashboard() {
   const [pageSize, setPageSize] = React.useState(5);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["basic-user"],
-    queryFn: getBasicUser,
+    queryKey: ["users"],
+    queryFn: getUsers,
   });
 
-  const rows = React.useMemo(() => (data ? [data] : []), [data]);
+  const rows = React.useMemo(() => data ?? [], [data]);
   const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
   const safePageIndex = Math.min(pageIndex, pageCount - 1);
   const start = safePageIndex * pageSize;
@@ -49,13 +52,13 @@ export function UserDashboard() {
 
   return (
     <main className="min-h-screen bg-background p-6 md:p-10">
-      <section className="mx-auto max-w-5xl space-y-6">
+      <section className="mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
             User Dashboard
           </h1>
           <p className="text-sm text-muted-foreground">
-            Data source: https://mockly.me/user/basic
+            Data source: https://mockly.me/users
           </p>
         </div>
 
@@ -73,14 +76,17 @@ export function UserDashboard() {
 
         {data && (
           <div className="space-y-4 rounded-lg border border-border bg-card p-4">
-            <div className="overflow-x-auto">
+            <div className="">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
                     <TableHead>Name</TableHead>
+                    <TableHead>Username</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
+                    <TableHead>Job Title</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Created At</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -88,7 +94,7 @@ export function UserDashboard() {
                   {pagedRows.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={5}
+                        colSpan={8}
                         className="h-24 text-center text-muted-foreground"
                       >
                         No users found.
@@ -99,12 +105,17 @@ export function UserDashboard() {
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">{user.id}</TableCell>
                         <TableCell>{user.name}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {user.username}
+                        </TableCell>
                         <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.job_title}</TableCell>
+                        <TableCell>{user.company}</TableCell>
                         <TableCell className="capitalize">
-                          {user.role}
+                          {user.subscription_status}
                         </TableCell>
                         <TableCell>
-                          {new Date(user.createdAt).toLocaleString()}
+                          {new Date(user.created_at).toLocaleString()}
                         </TableCell>
                       </TableRow>
                     ))

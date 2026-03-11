@@ -1,5 +1,5 @@
 import { useDeck } from "@/app/dashboard/contexts/DeckContext";
-import html2canvas from "html2canvas";
+import { snapdom } from "@zumer/snapdom";
 import { v4 as uuid } from "uuid";
 import { useRef, type ReactNode } from "react";
 
@@ -17,7 +17,7 @@ export function ScreenShot({
 
   const takeScreenshot = async () => {
     if (!ref.current) return;
-    const canvas = await html2canvas(ref.current);
+    const canvas = await snapdom.toCanvas(ref.current);
 
     // Create a thumbnail (scaled-down version)
     const thumbnailCanvas = document.createElement("canvas");
@@ -51,7 +51,7 @@ export function ScreenShot({
         onClick={takeScreenshot}
         className="absolute top-2 right-2 px-2.5 py-1 text-xs cursor-pointer bg-black/60 text-white border-none rounded"
       >
-        Screenshot
+        Add
       </button>
     </div>
   );

@@ -239,7 +239,7 @@ export function ProductsDashboard() {
   const total = data?.total ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] font-sans">
+    <div className="min-h-screen bg-amber-200 font-sans">
       {/* ── Header ── */}
       <div className="flex items-end justify-between border-b-[1.5px] border-[#111110] px-8 pt-10 pb-5">
         <div className="flex items-baseline gap-4">

@@ -1,10 +1,4 @@
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import PptxGenJS from "pptxgenjs";
 
 export interface DeckScreenshot {
@@ -29,11 +23,11 @@ export function DeckProvider({ children }: { children: ReactNode }) {
 
   const addScreenshot = (screenshot: DeckScreenshot) => {
     setScreenshots((prevScreenshots) => [...prevScreenshots, screenshot]);
+    // localStorage.setItem(
+    //   "screenshots",
+    //   JSON.stringify([...screenshots, screenshot]),
+    // );
   };
-
-  useEffect(() => {
-    console.log("Updated screenshots:", screenshots);
-  }, [screenshots]);
 
   const getImageDimensions = (src: string) =>
     new Promise<{ width: number; height: number }>((resolve, reject) => {
@@ -100,25 +94,27 @@ export function DeckProvider({ children }: { children: ReactNode }) {
   return (
     <DeckContext.Provider value={{ screenshots, addScreenshot }}>
       {screenshots.length > 0 && (
-        <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end space-y-2">
-          <button
-            onClick={setScreenshots.bind(null, [])}
-            className="rounded border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {"Clear Screenshots"}
-          </button>
+        <div className="fixed top-4 right-4 z-50 flex flex-col items-end space-y-2 bg-blue-200/80 p-3 rounded shadow-lg">
+          <div className="flex flex-row items-center space-x-au">
+            <button
+              onClick={setScreenshots.bind(null, [])}
+              className="rounded border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {"Clear"}
+            </button>
 
-          <button
-            onClick={exportToPowerPoint}
-            disabled={isExporting}
-            className="rounded border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isExporting ? "Exporting..." : "Export PPTX"}
-          </button>
+            <button
+              onClick={exportToPowerPoint}
+              disabled={isExporting}
+              className="rounded border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isExporting ? "Exporting..." : "Export PPTX"}
+            </button>
+          </div>
           {screenshots.map((screenshot) => (
             <div
               key={screenshot.id}
-              className="w-32 h-20 rounded overflow-hidden border border-border bg-card"
+              className="w-64 h-36 rounded overflow-hidden border border-border bg-card"
             >
               <img
                 src={screenshot.thumbnail}
