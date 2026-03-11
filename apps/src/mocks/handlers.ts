@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw"
 import type { PaymentAccountPageResponse } from "@api/types"
 import { mockAccounts } from "./accounts.data"
+import { getProductsResponse, type ProductsResponse } from "./products.data"
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -55,6 +56,14 @@ export const handlers = [
     if (sort) results = applySort(results, sort)
 
     return HttpResponse.json<PaymentAccountPageResponse>(paginate(results, pageNumber, pageSize))
+  }),
+
+  http.get("https://mockly.me/products", ({ request }) => {
+    const url = new URL(request.url)
+    const limit = Number(url.searchParams.get("limit") ?? 10)
+    const skip = Number(url.searchParams.get("skip") ?? 0)
+
+    return HttpResponse.json<ProductsResponse>(getProductsResponse({ limit, skip }))
   }),
 
 ]

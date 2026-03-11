@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,7 +8,7 @@ import {
   type ColumnDef,
   type PaginationState,
   type SortingState,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -18,73 +18,64 @@ import {
   ArrowDownIcon,
   ArrowUpDownIcon,
   SearchIcon,
-} from "lucide-react"
-import { useGetProducts } from "@/hooks/useProducts"
-import type { Product } from "@/mocks/products.data"
+} from "lucide-react";
+import { useGetProducts } from "@/hooks/useProducts";
+import type { Product } from "@/mocks/products.data";
 
 // ─── Rating dots ─────────────────────────────────────────────────────────────
 function RatingDots({ value }: { value: number }) {
-  const filled = Math.round(value)
+  const filled = Math.round(value);
   return (
     <div className="flex items-center gap-0.75">
       {Array.from({ length: 5 }).map((_, i) => (
         <span
           key={i}
-          className="inline-block size-1.75 rounded-full"
-          style={{
-            background: i < filled ? "#E54D2E" : "#D9D9D6",
-            opacity: i < filled ? 1 : 0.5,
-          }}
+          className={`inline-block size-1.75 rounded-full ${
+            i < filled ? "bg-[#E54D2E] opacity-100" : "bg-[#D9D9D6] opacity-50"
+          }`}
         />
       ))}
-      <span
-        className="ml-1.5 text-[11px] tabular-nums"
-        style={{ color: "#6F6F6B" }}
-      >
+      <span className="ml-1.5 text-[11px] tabular-nums text-[#6F6F6B]">
         {value.toFixed(1)}
       </span>
     </div>
-  )
+  );
 }
 
 // ─── Stock badge ──────────────────────────────────────────────────────────────
 function StockBadge({ stock }: { stock: number }) {
   if (stock === 0) {
     return (
-      <span
-        className="text-[11px] tracking-wide uppercase"
-        style={{ color: "#A8A8A4" }}
-      >
+      <span className="text-[11px] tracking-wide uppercase text-[#A8A8A4]">
         Out
       </span>
-    )
+    );
   }
-  const level = stock > 50 ? "high" : stock > 10 ? "mid" : "low"
-  const color = level === "high" ? "#3D9A60" : level === "mid" ? "#D97706" : "#E54D2E"
+  const levelClass =
+    stock > 50 ? "bg-[#3D9A60]" : stock > 10 ? "bg-[#D97706]" : "bg-[#E54D2E]";
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span
-        className="inline-block size-1.5 rounded-full"
-        style={{ background: color }}
-      />
-      <span className="tabular-nums text-sm" style={{ color: "#111110" }}>
+      <span className={`inline-block size-1.5 rounded-full ${levelClass}`} />
+      <span className="tabular-nums text-sm text-[#111110]">
         {stock.toLocaleString()}
       </span>
     </span>
-  )
+  );
 }
 
 // ─── Sort icon ────────────────────────────────────────────────────────────────
 function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
-  const cls = "ml-1 inline size-3"
-  if (isSorted === "asc") return <ArrowUpIcon className={cls} style={{ color: "#E54D2E" }} />
-  if (isSorted === "desc") return <ArrowDownIcon className={cls} style={{ color: "#E54D2E" }} />
-  return <ArrowUpDownIcon className={cls} style={{ color: "#C4C4C0" }} />
+  const cls = "ml-1 inline size-3";
+  if (isSorted === "asc")
+    return <ArrowUpIcon className={`${cls} text-[#E54D2E]`} />;
+  if (isSorted === "desc")
+    return <ArrowDownIcon className={`${cls} text-[#E54D2E]`} />;
+  return <ArrowUpDownIcon className={`${cls} text-[#C4C4C0]`} />;
 }
 
 // ─── Thumbnail hover cell ─────────────────────────────────────────────────────
 function ProductTitle({ product }: { product: Product }) {
-  const [hovered, setHovered] = React.useState(false)
+  const [hovered, setHovered] = React.useState(false);
 
   return (
     <span
@@ -93,15 +84,7 @@ function ProductTitle({ product }: { product: Product }) {
       onMouseLeave={() => setHovered(false)}
     >
       {hovered && product.thumbnail && (
-        <span
-          className="absolute bottom-full left-0 z-50 mb-2 block rounded overflow-hidden shadow-xl"
-          style={{
-            width: 120,
-            height: 120,
-            border: "1px solid #E5E5E3",
-            background: "#FFF",
-          }}
-        >
+        <span className="absolute bottom-full left-0 z-50 mb-2 block size-[120px] overflow-hidden rounded border border-[#E5E5E3] bg-white shadow-xl">
           <img
             src={product.thumbnail}
             alt={product.title}
@@ -109,11 +92,11 @@ function ProductTitle({ product }: { product: Product }) {
           />
         </span>
       )}
-      <span className="font-medium text-sm" style={{ color: "#111110" }}>
+      <span className="text-sm font-medium text-[#111110]">
         {product.title}
       </span>
     </span>
-  )
+  );
 }
 
 // ─── Columns ──────────────────────────────────────────────────────────────────
@@ -128,10 +111,7 @@ const columns: ColumnDef<Product>[] = [
     accessorKey: "brand",
     header: "Brand",
     cell: ({ row }) => (
-      <span
-        className="text-xs tracking-widest uppercase"
-        style={{ color: "#6F6F6B" }}
-      >
+      <span className="text-xs tracking-widest uppercase text-[#6F6F6B]">
         {row.original.brand}
       </span>
     ),
@@ -141,14 +121,7 @@ const columns: ColumnDef<Product>[] = [
     accessorKey: "category",
     header: "Category",
     cell: ({ row }) => (
-      <span
-        className="inline-block rounded-sm px-2 py-0.5 text-[11px] tracking-wide uppercase"
-        style={{
-          background: "#F0F0EE",
-          color: "#6F6F6B",
-          border: "1px solid #E5E5E3",
-        }}
-      >
+      <span className="inline-block rounded-sm border border-[#E5E5E3] bg-[#F0F0EE] px-2 py-0.5 text-[11px] tracking-wide uppercase text-[#6F6F6B]">
         {row.original.category}
       </span>
     ),
@@ -158,24 +131,21 @@ const columns: ColumnDef<Product>[] = [
     accessorKey: "price",
     header: "Price",
     cell: ({ row }) => {
-      const price = row.original.price
-      const discount = row.original.discountPercentage
-      const discounted = price * (1 - discount / 100)
+      const price = row.original.price;
+      const discount = row.original.discountPercentage;
+      const discounted = price * (1 - discount / 100);
       return (
         <div className="text-right">
-          <span className="text-sm font-semibold tabular-nums" style={{ color: "#111110" }}>
+          <span className="text-sm font-semibold tabular-nums text-[#111110]">
             ${discounted.toFixed(2)}
           </span>
           {discount > 0.1 && (
-            <span
-              className="ml-1.5 text-xs tabular-nums line-through"
-              style={{ color: "#A8A8A4" }}
-            >
+            <span className="ml-1.5 text-xs tabular-nums text-[#A8A8A4] line-through">
               ${price.toFixed(2)}
             </span>
           )}
         </div>
-      )
+      );
     },
     enableSorting: true,
   },
@@ -183,16 +153,13 @@ const columns: ColumnDef<Product>[] = [
     accessorKey: "discountPercentage",
     header: "Off",
     cell: ({ row }) => {
-      const d = row.original.discountPercentage
-      if (d < 0.1) return <span style={{ color: "#C4C4C0" }}>—</span>
+      const d = row.original.discountPercentage;
+      if (d < 0.1) return <span className="text-[#C4C4C0]">—</span>;
       return (
-        <span
-          className="text-xs font-medium tabular-nums px-1.5 py-0.5 rounded-sm"
-          style={{ background: "#FEE9E5", color: "#E54D2E" }}
-        >
+        <span className="rounded-sm bg-[#FEE9E5] px-1.5 py-0.5 text-xs font-medium tabular-nums text-[#E54D2E]">
           -{d.toFixed(0)}%
         </span>
-      )
+      );
     },
     enableSorting: true,
   },
@@ -214,20 +181,19 @@ const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
         {row.original.tags.length === 0 ? (
-          <span style={{ color: "#C4C4C0" }}>—</span>
+          <span className="text-[#C4C4C0]">—</span>
         ) : (
           row.original.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="text-[10px] tracking-wide uppercase px-1.5 py-0.5 rounded-sm"
-              style={{ background: "#F5F5F3", color: "#8C8C88", border: "1px solid #E5E5E3" }}
+              className="rounded-sm border border-[#E5E5E3] bg-[#F5F5F3] px-1.5 py-0.5 text-[10px] tracking-wide uppercase text-[#8C8C88]"
             >
               {tag}
             </span>
           ))
         )}
         {row.original.tags.length > 3 && (
-          <span className="text-[10px]" style={{ color: "#A8A8A4" }}>
+          <span className="text-[10px] text-[#A8A8A4]">
             +{row.original.tags.length - 3}
           </span>
         )}
@@ -235,26 +201,26 @@ const columns: ColumnDef<Product>[] = [
     ),
     enableSorting: false,
   },
-]
+];
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export function ProductsDashboard() {
-  const [globalFilter, setGlobalFilter] = React.useState("")
+  const [globalFilter, setGlobalFilter] = React.useState("");
 
   // Reset to first page whenever search changes
   React.useEffect(() => {
-    setPagination((p) => ({ ...p, pageIndex: 0 }))
-  }, [globalFilter])
-  const [sorting, setSorting] = React.useState<SortingState>([])
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }, [globalFilter]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
-  })
+  });
 
   const { data, isLoading, isError } = useGetProducts({
     limit: pagination.pageSize,
     skip: pagination.pageIndex * pagination.pageSize,
-  })
+  });
 
   const table = useReactTable({
     data: data?.products ?? [],
@@ -268,32 +234,20 @@ export function ProductsDashboard() {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-  })
+  });
 
-  const total = data?.total ?? 0
+  const total = data?.total ?? 0;
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ background: "#FAFAF8", fontFamily: "var(--font-sans)" }}
-    >
+    <div className="min-h-screen bg-[#FAFAF8] font-sans">
       {/* ── Header ── */}
-      <div
-        className="flex items-end justify-between px-8 pt-10 pb-5"
-        style={{ borderBottom: "1.5px solid #111110" }}
-      >
+      <div className="flex items-end justify-between border-b-[1.5px] border-[#111110] px-8 pt-10 pb-5">
         <div className="flex items-baseline gap-4">
-          <h1
-            className="text-[11px] font-semibold tracking-[0.25em] uppercase"
-            style={{ color: "#111110" }}
-          >
+          <h1 className="text-[11px] font-semibold tracking-[0.25em] uppercase text-[#111110]">
             Products
           </h1>
           {data && (
-            <span
-              className="text-[11px] tabular-nums"
-              style={{ color: "#A8A8A4" }}
-            >
+            <span className="text-[11px] tabular-nums text-[#A8A8A4]">
               {total.toLocaleString()} {globalFilter ? "results" : "items"}
             </span>
           )}
@@ -301,22 +255,13 @@ export function ProductsDashboard() {
 
         {/* Search */}
         <div className="relative flex items-center">
-          <SearchIcon
-            className="absolute left-0 size-3.5 pointer-events-none"
-            style={{ color: "#A8A8A4" }}
-          />
+          <SearchIcon className="pointer-events-none absolute left-0 size-3.5 text-[#A8A8A4]" />
           <input
             type="text"
             placeholder="Search…"
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="bg-transparent pl-5 text-sm outline-none placeholder:text-[#C4C4C0]"
-            style={{
-              color: "#111110",
-              borderBottom: "1px solid #D9D9D6",
-              paddingBottom: "2px",
-              width: 220,
-            }}
+            className="w-[220px] border-b border-[#D9D9D6] bg-transparent pb-0.5 pl-5 text-sm text-[#111110] outline-none placeholder:text-[#C4C4C0]"
           />
         </div>
       </div>
@@ -326,35 +271,33 @@ export function ProductsDashboard() {
         <table className="w-full border-collapse text-sm">
           <thead>
             {table.getHeaderGroups().map((hg) => (
-              <tr key={hg.id} style={{ borderBottom: "1px solid #E5E5E3" }}>
+              <tr key={hg.id} className="border-b border-[#E5E5E3]">
                 {hg.headers.map((header) => {
-                  const canSort = header.column.getCanSort()
+                  const canSort = header.column.getCanSort();
                   return (
                     <th
                       key={header.id}
-                      className="px-4 py-3 text-left font-medium"
-                      style={{
-                        fontSize: 10,
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                        color: "#A8A8A4",
-                        whiteSpace: "nowrap",
-                        background: "#FAFAF8",
-                      }}
+                      className="whitespace-nowrap bg-[#FAFAF8] px-4 py-3 text-left text-[10px] font-medium tracking-[0.12em] uppercase text-[#A8A8A4]"
                     >
                       {header.isPlaceholder ? null : canSort ? (
                         <button
                           className="inline-flex items-center gap-0.5 cursor-pointer select-none hover:opacity-70 transition-opacity"
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                           <SortIcon isSorted={header.column.getIsSorted()} />
                         </button>
                       ) : (
-                        flexRender(header.column.columnDef.header, header.getContext())
+                        flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )
                       )}
                     </th>
-                  )
+                  );
                 })}
               </tr>
             ))}
@@ -365,14 +308,10 @@ export function ProductsDashboard() {
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-16 text-center text-sm"
-                  style={{ color: "#A8A8A4" }}
+                  className="px-4 py-16 text-center text-sm text-[#A8A8A4]"
                 >
                   <span className="inline-flex items-center gap-2">
-                    <span
-                      className="inline-block size-1.5 rounded-full animate-pulse"
-                      style={{ background: "#E54D2E" }}
-                    />
+                    <span className="inline-block size-1.5 rounded-full bg-[#E54D2E] animate-pulse" />
                     Loading catalogue…
                   </span>
                 </td>
@@ -381,8 +320,7 @@ export function ProductsDashboard() {
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-16 text-center text-sm"
-                  style={{ color: "#E54D2E" }}
+                  className="px-4 py-16 text-center text-sm text-[#E54D2E]"
                 >
                   Failed to load products.
                 </td>
@@ -391,8 +329,7 @@ export function ProductsDashboard() {
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-16 text-center text-sm"
-                  style={{ color: "#A8A8A4" }}
+                  className="px-4 py-16 text-center text-sm text-[#A8A8A4]"
                 >
                   No products match your search.
                 </td>
@@ -401,26 +338,16 @@ export function ProductsDashboard() {
               table.getRowModel().rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className="transition-colors"
-                  style={{
-                    borderBottom: "1px solid #F0F0EE",
-                    background: i % 2 === 0 ? "#FAFAF8" : "#F7F7F5",
-                  }}
-                  onMouseEnter={(e) => {
-                    ;(e.currentTarget as HTMLTableRowElement).style.background = "#F0F0ED"
-                  }}
-                  onMouseLeave={(e) => {
-                    ;(e.currentTarget as HTMLTableRowElement).style.background =
-                      i % 2 === 0 ? "#FAFAF8" : "#F7F7F5"
-                  }}
+                  className={`border-b border-[#F0F0EE] transition-colors hover:bg-[#F0F0ED] ${
+                    i % 2 === 0 ? "bg-[#FAFAF8]" : "bg-[#F7F7F5]"
+                  }`}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className="px-4 py-3"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <td key={cell.id} className="align-middle px-4 py-3">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -431,13 +358,10 @@ export function ProductsDashboard() {
       </div>
 
       {/* ── Pagination ── */}
-      <div
-        className="flex items-center justify-between px-8 py-4"
-        style={{ borderTop: "1px solid #E5E5E3" }}
-      >
+      <div className="flex items-center justify-between border-t border-[#E5E5E3] px-8 py-4">
         {/* Rows per page */}
         <div className="flex items-center gap-3">
-          <span className="text-[11px] tracking-widest uppercase" style={{ color: "#A8A8A4" }}>
+          <span className="text-[11px] tracking-widest uppercase text-[#A8A8A4]">
             Per page
           </span>
           <div className="flex gap-1">
@@ -445,13 +369,11 @@ export function ProductsDashboard() {
               <button
                 key={n}
                 onClick={() => table.setPageSize(n)}
-                className="px-2.5 py-1 text-xs rounded-sm transition-colors"
-                style={{
-                  background: pagination.pageSize === n ? "#111110" : "transparent",
-                  color: pagination.pageSize === n ? "#FAFAF8" : "#6F6F6B",
-                  border: "1px solid",
-                  borderColor: pagination.pageSize === n ? "#111110" : "#E5E5E3",
-                }}
+                className={`rounded-sm border px-2.5 py-1 text-xs transition-colors ${
+                  pagination.pageSize === n
+                    ? "border-[#111110] bg-[#111110] text-[#FAFAF8]"
+                    : "border-[#E5E5E3] bg-transparent text-[#6F6F6B]"
+                }`}
               >
                 {n}
               </button>
@@ -461,10 +383,7 @@ export function ProductsDashboard() {
 
         {/* Page nav */}
         <div className="flex items-center gap-4">
-          <span
-            className="text-[11px] tabular-nums tracking-wide"
-            style={{ color: "#A8A8A4" }}
-          >
+          <span className="text-[11px] tabular-nums tracking-wide text-[#A8A8A4]">
             {pagination.pageIndex + 1} / {table.getPageCount() || 1}
           </span>
           <div className="flex items-center gap-1">
@@ -498,13 +417,11 @@ export function ProductsDashboard() {
                 key={label}
                 onClick={action}
                 disabled={disabled}
-                className="flex size-7 items-center justify-center rounded-sm transition-colors"
-                style={{
-                  border: "1px solid #E5E5E3",
-                  color: disabled ? "#D9D9D6" : "#6F6F6B",
-                  background: disabled ? "transparent" : "#FAFAF8",
-                  cursor: disabled ? "not-allowed" : "pointer",
-                }}
+                className={`flex size-7 items-center justify-center rounded-sm border border-[#E5E5E3] transition-colors ${
+                  disabled
+                    ? "cursor-not-allowed bg-transparent text-[#D9D9D6]"
+                    : "cursor-pointer bg-[#FAFAF8] text-[#6F6F6B]"
+                }`}
               >
                 <span className="sr-only">{label}</span>
                 {icon}
@@ -514,5 +431,5 @@ export function ProductsDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

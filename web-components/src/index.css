@@ -7,6 +7,29 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(330 0% 3.94%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(330 0% 3.94%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(330 0% 3.94%);
+  --primary: hsl(0 0% 9.05%);
+  --primary-foreground: hsl(180 0% 98.03%);
+  --secondary: hsl(120 0% 96.06%);
+  --secondary-foreground: hsl(0 0% 9.05%);
+  --muted: hsl(120 0% 96.06%);
+  --muted-foreground: hsl(0 0% 45.15%);
+  --accent: hsl(120 0% 96.06%);
+  --accent-foreground: hsl(0 0% 9.05%);
+  --destructive: hsl(358.87 74.66% 50.34%);
+  --border: hsl(240 0% 89.82%);
+  --input: hsl(240 0% 89.82%);
+  --ring: hsl(0 0% 63.02%);
+  --chart-1: hsl(210.69 100% 77.83%);
+  --chart-2: hsl(216.26 100% 58.47%);
+  --chart-3: hsl(221.34 97.06% 53.50%);
+  --chart-4: hsl(225.35 84.10% 48.98%);
+  --chart-5: hsl(227.10 75.74% 41.14%);
     --background: hsl(0 0% 100%);
     --foreground: hsl(0 0% 3.9%);
     --card: hsl(0 0% 100%);
