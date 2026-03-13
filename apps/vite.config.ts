@@ -1,14 +1,27 @@
 import path from 'path'
+import fs from 'fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import cssInjectedByJs from 'vite-plugin-css-injected-by-js'
+import type { Plugin } from 'vite'
 
-export default defineConfig({
+function excludeMockServiceWorker(): Plugin {
+  return {
+    name: 'exclude-mock-service-worker',
+    closeBundle() {
+      const file = path.resolve(__dirname, 'dist/mockServiceWorker.js')
+      if (fs.existsSync(file)) fs.unlinkSync(file)
+    },
+  }
+}
+
+export default defineConfig(({ command }) => ({
   plugins: [
     react(),
     tailwindcss(),
     cssInjectedByJs(),
+    ...(command === 'build' ? [excludeMockServiceWorker()] : []),
   ],
   resolve: {
     alias: {
@@ -23,4 +36,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

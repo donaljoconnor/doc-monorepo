@@ -81,21 +81,21 @@ export function AccountsDashboard() {
 
       <div className="rounded-lg border bg-card p-4">
         {isLoading ? (
-          <div className="flex h-[420px] items-center justify-center text-muted-foreground">
+          <div className="flex h-105 items-center justify-center text-muted-foreground">
             Loading chart...
           </div>
         ) : isError ? (
-          <div className="flex h-[420px] items-center justify-center text-destructive">
+          <div className="flex h-105 items-center justify-center text-destructive">
             Failed to load accounts.
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex h-[420px] items-center justify-center text-muted-foreground">
+          <div className="flex h-105 items-center justify-center text-muted-foreground">
             No account data available.
           </div>
         ) : (
           <ChartContainer
             config={chartConfig}
-            className="mx-auto h-[420px] w-full max-w-3xl"
+            className="mx-auto h-105 w-full max-w-3xl"
           >
             <RadarChart data={chartData} outerRadius="72%">
               <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
