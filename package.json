@@ -11,7 +11,8 @@
     "build:apps": "pnpm --filter @doc-monorepo/apps build",
     "build:web-components": "pnpm --filter @doc-monorepo/web-components build",
     "build:api": "pnpm --filter @doc-monorepo/api build",
-    "preview": "pnpm -r preview"
+    "preview": "pnpm -r preview",
+    "test": "pnpm -r test"
   },
   "pnpm": {
     "onlyBuiltDependencies": ["esbuild"]

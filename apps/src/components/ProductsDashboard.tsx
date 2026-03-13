@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useGetProducts } from "@/hooks/useProducts";
 import type { Product } from "@/mocks/products.data";
+import { FeedbackButton } from "@/components/FeedbackButton";
 
 // ─── Rating dots ─────────────────────────────────────────────────────────────
 function RatingDots({ value }: { value: number }) {
@@ -253,16 +254,19 @@ export function ProductsDashboard() {
           )}
         </div>
 
-        {/* Search */}
-        <div className="relative flex items-center">
-          <SearchIcon className="pointer-events-none absolute left-0 size-3.5 text-[#A8A8A4]" />
-          <input
-            type="text"
-            placeholder="Search…"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-[220px] border-b border-[#D9D9D6] bg-transparent pb-0.5 pl-5 text-sm text-[#111110] outline-none placeholder:text-[#C4C4C0]"
-          />
+        <div className="flex items-center gap-4">
+          <FeedbackButton />
+          {/* Search */}
+          <div className="relative flex items-center">
+            <SearchIcon className="pointer-events-none absolute left-0 size-3.5 text-[#A8A8A4]" />
+            <input
+              type="text"
+              placeholder="Search…"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-[220px] border-b border-[#D9D9D6] bg-transparent pb-0.5 pl-5 text-sm text-[#111110] outline-none placeholder:text-[#C4C4C0]"
+            />
+          </div>
         </div>
       </div>
 
